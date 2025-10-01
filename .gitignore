@@ -1,0 +1,94 @@
+# ---- Build output
+bin/
+obj/
+out/
+[Bb]uild/
+[Bb]in/
+[Oo]bj/
+Debug/
+Release/
+
+# ---- .NET artifacts
+*.dbmdl
+*.log
+*.svclog
+*.userosscache
+*.sln.docstates
+*.ildasm
+*.cache
+*.generated.cs
+*.lock.json
+# NuGet packages & artifacts
+*.nupkg
+*.snupkg
+# MSBuild/NuGet auto-generated files
+*.nuget.props
+*.nuget.targets
+
+# ---- Publish & deployment
+*.pubxml
+*.pubxml.user
+PublishProfiles/
+*.publishsettings
+
+# ---- Configuration / Secrets (keep base appsettings.json tracked)
+appsettings.*.local.json
+*.secrets.json
+*.env
+*.env.*
+secrets.json
+
+# ---- IDE: Visual Studio
+.vs/
+*.suo
+*.user
+*.userprefs
+
+# ---- IDE: Rider / IntelliJ
+.idea/
+*.sln.iml
+
+# ---- IDE: VS Code (keep shared recommendations if you want)
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+# (Uncomment if you also want to keep launch/tasks)
+# !.vscode/launch.json
+# !.vscode/tasks.json
+
+# ---- Test output & coverage
+TestResults/
+*.trx
+*.coverage
+*.coveragexml
+coverage/
+coverage.xml
+*.opencover.xml
+*.lcov
+
+# ---- Resharper / NCrunch
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
+.nCrunch*/
+
+# ---- OS junk
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Icon?
+desktop.ini
+$RECYCLE.BIN/
+
+# ---- Node/Web (in case you add tooling)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+wwwroot/lib/
+wwwroot/dist/
+
+# ---- Containers / misc
+.localhistory/
+*.swp
+*.orig
