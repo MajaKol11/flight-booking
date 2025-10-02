@@ -1,0 +1,107 @@
+@page "/Book-Flight"
+@rendermode InteractiveServer
+@using flight_booking.Core
+@inject MPISModel Model
+@inject MPISController Controller
+@implements IDisposable
+
+<h3>Book Flight</h3>
+<p><strong>Current state: </strong> @Model.State</p>
+
+@if (Model.State == MpisState.FlightEnquiry)
+{
+    <!-- Flight list + back button-->
+    <div class="mb-3">
+        <button class="btn btn-secondary" @onclick="() => Controller.Back()">Back</button>
+    </div>
+
+    <h5>Select a flight</h5>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Number</th>
+                <th>From → To</th>
+                <th>Departure</th>
+                <th>Seats</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var f in Model.Flights)
+            {
+                <tr>
+                    <td>@f.Number</td>
+                    <td>@f.From → @f.To</td>
+                    <td>@f.DepartureUtc.ToString("yyyy-MM-dd HH:mm")</td>
+                    <td>@f.SeatsAvailable</td>
+                    <td><button class="btn btn-primary" @onclick="() => SelectFlight(f.Id)">Select</button></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else if (Model.State == MpisState.SeatEnquiry)
+{
+    <div class="mb-3">
+        <button class="btn btn-secondary" @onclick="() => Controller.Back()">Back</button>
+    </div>
+
+<h5>Seat Selection</h5>
+<p>
+    <em>Selected Flight: </em>
+    @Model.SelectedFlight?.Number (@Model.SelectedFlight?.From → @Model.SelectedFlight?.To)
+</p>
+}
+else if (Model.State == MpisState.Reservation)
+{
+    <!-- Review and confirm -->
+    <div class="mb-3" style="display:flex; gap: .5rem; flex-wrap:wrap;">
+        <button class="btn btn-secondary" @onclick="() => Controller.Back()">Back</button>
+        <button class="btn btn-success" @onclick="() => Controller.Confirm()">Confirm</button>
+    </div>
+
+    <h5>Review</h5>
+    <ul>
+        <li><strong>Flight:</strong> @Model.SelectedFlight?.Number (@Model.SelectedFlight?.From → @Model.SelectedFlight?.To)</li>
+        <li><strong>Seat:</strong> @Model.SelectedSeat</li>
+    </ul>
+}
+else if (Model.State ==MpisState.Confirmation)
+{
+    <div class="alert alert-success">
+        <strong>Confirmation</strong> @Model.ConfirmationCode
+    </div>
+    <button class="btn btn-secondary" @onclick="() => Controller.Back()">Back</button>
+    <button class="btn btn-primary" @onclick="() => Controller.Finish()">Finish</button>
+}
+else
+{
+    <!-- Initial state -->
+    <button class="btn btn-primary" @onclick="Controller.Start">Start</button>
+}
+
+@code
+{
+    protected override void OnInitialized()
+    {
+        //Subscribe to model changees so the page re-renders when data/state changes
+        Model.Changed += OnChanged;
+    }
+
+    private void OnChanged() => InvokeAsync(StateHasChanged);
+
+    private void SelectFlight(string id)
+    {
+        var ok = Controller.PickFlight(id);
+        if (!ok)
+        {
+            Console.WriteLine("Failed to pick flight.");
+        }
+    }
+
+    public void Dispose()
+    {
+        //Unsubscribe to avoid memory leaks on disconnect
+        Model.Changed -= OnChanged;
+    }
+}
