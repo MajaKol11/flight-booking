@@ -45,6 +45,8 @@ namespace flight_booking.Core
 
         private readonly List<Flight> _flights = new();
         private readonly List<string> _seats = new();
+        private readonly Dictionary<string, HashSet<string>> _reservedByFlight =
+         new(StringComparer.OrdinalIgnoreCase);
 
         //Move from Initial to FlightEnquiry and load flights
         public void startFlow()
@@ -153,6 +155,36 @@ namespace flight_booking.Core
                 foreach (var col in new[] { 'A', 'B', 'C', 'D' })
                     _seats.Add($"{row}{col}");
             }
+
+            if (SelectedFlight is not null && !_reservedByFlight.ContainsKey(SelectedFlight.Id))
+            {
+                _reservedByFlight[SelectedFlight.Id] = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+                //Demo only: mark a few seats as already taken
+                var fn = SelectedFlight.Number ?? "MP";
+                int seed = fn.Aggregate(19, (acc, ch) => acc * 31 + ch);
+                var rnd = new Random(seed);
+
+                //Pick up to 2 seats to mark as taken
+                var candidates = _seats.ToList();
+                for (int i = 0; i < 2 && candidates.Count > 0; i++)
+                {
+                    int index = rnd.Next(candidates.Count);
+                    _reservedByFlight[SelectedFlight.Id].Add(candidates[index]);
+                    candidates.RemoveAt(index);
+                }
+            }
+        }
+
+        //Returns true if the seat is taken 
+        public bool IsSeatTaken(string seat)
+        {
+            if (SelectedFlight is null) return false;
+
+            if (_reservedByFlight.TryGetValue(SelectedFlight.Id, out var set))
+                return set.Contains(seat);
+
+            return false;
         }
     }
 }

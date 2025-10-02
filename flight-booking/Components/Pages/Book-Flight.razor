@@ -42,15 +42,41 @@
 }
 else if (Model.State == MpisState.SeatEnquiry)
 {
-    <div class="mb-3">
+    <!-- Seat selection with buttons. Taken seats are disabled. Clicking seat moves to reservation-->
+    <div class="mb-3" style="display:flex; gap:.5rem; flex-wrap:wrap;">
         <button class="btn btn-secondary" @onclick="() => Controller.Back()">Back</button>
     </div>
 
-<h5>Seat Selection</h5>
+<h5>Choose your seat</h5>
 <p>
-    <em>Selected Flight: </em>
+    <em>Flight: </em>
     @Model.SelectedFlight?.Number (@Model.SelectedFlight?.From → @Model.SelectedFlight?.To)
 </p>
+
+ <div style="display:flex; flex-direction:column; gap:.5rem; max-width:340px;">
+        @for (int row = 1; row <= 3; row++)
+        {
+            <div style="display:flex; gap:.5rem;">
+                @foreach (var col in new[] { 'A', 'B', 'C', 'D' })
+                {
+                    var seat = $"{row}{col}";
+                    bool taken = Model.IsSeatTaken(seat);
+
+                    <button class="btn @(taken ? "btn-outline-secondary" : "btn-primary")"
+                            disabled="@(taken)"
+                            title="@(taken ? "Seat is taken" : "Select seat")"
+                            style="min-width:64px;"
+                            @onclick="() => PickSeat(seat)">
+                        @seat
+                    </button>
+                }
+            </div>
+        }
+    </div>
+
+    <p class="text-muted" style="margin-top:.75rem;">
+        Seats in grey are already taken
+    </p>
 }
 else if (Model.State == MpisState.Reservation)
 {
@@ -96,6 +122,15 @@ else
         if (!ok)
         {
             Console.WriteLine("Failed to pick flight.");
+        }
+    }
+
+    private void PickSeat(string seat)
+    {
+        var ok = Controller.PickSeat(seat);
+        if (!ok)
+        {
+            Console.WriteLine("Failed tp pick seat (maybe taken or wrong state).");
         }
     }
 
